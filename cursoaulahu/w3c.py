@@ -9,4 +9,5 @@ def convert_xml(url):
         print(p['TITLE'])
 
 
-convert_xml('http://www.w3schools.com/xml/cd_catalog.xml')
+if __name__ == '__main__':
+    convert_xml('http://www.w3schools.com/xml/cd_catalog.xml')
