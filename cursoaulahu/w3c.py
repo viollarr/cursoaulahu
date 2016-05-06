@@ -2,12 +2,14 @@ import requests
 import xmltodict
 
 
-def convert_xml(url):
-    r = requests.get(url)
+def convert_xml():
+    r = requests.get('http://www.w3schools.com/xml/cd_catalog.xml')
     response = xmltodict.parse(r.text)
+    ret = []
     for p in response['CATALOG']['CD']:
-        print(p['TITLE'])
+        ret.append(p['TITLE'])
+    return ret
 
 
 if __name__ == '__main__':
-    convert_xml('http://www.w3schools.com/xml/cd_catalog.xml')
+    print(convert_xml())
