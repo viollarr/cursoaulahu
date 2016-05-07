@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 from os import path
 import sys
 
@@ -10,9 +11,13 @@ sys.path.append(diretorio_huaula)
 from cursoaulahu.telefonista import Telefonista, Telefone
 
 
-class TelefoneMoc(Telefone):
+class TelefoneMock(Telefone):
+    def __init__(self):
+        self.numero = None
+
     def telefonar(self, numero):
-        return 'Tel fake para {}'.format(numero)
+        self.numero = numero
+        return 'Tel fake para {}'.format(self.numero)
 
 
 class TelefonistaTeste(unittest.TestCase):
@@ -30,17 +35,31 @@ class TelefonistaTeste(unittest.TestCase):
         telefonista.adicionar_contato(*renzo)
         self.assertEqual([victor, renzo], telefonista._contatos)
 
-    def test_telefonar_um_contato(self):
+    def test_telefonar_um_contato_sem_utilizar_pacote_mock(self):
         telefonista = Telefonista()
-        telefonista._telefone = TelefoneMoc()
+        telefone_mock = TelefoneMock()
+        telefonista._telefone = telefone_mock
         contato = ('Victor', '2345678')
         telefonista.adicionar_contato(*contato)
         resultado_da_ligacao = telefonista.ligar()
         self.assertEqual('Contato Victor, Tel fake para 2345678', resultado_da_ligacao)
+        self.assertEqual('2345678', telefone_mock.numero)
+
+    def test_telefonar_um_contato_utilizando_pacote_mock(self):
+        telefonista = Telefonista()
+        telefone_mock = Mock()
+        telefonista._telefone = telefone_mock
+        telefone_mock.telefonar = Mock(return_value='Tel fake para 2345678')
+        contato = ('Victor', '2345678')
+        telefonista.adicionar_contato(*contato)
+        resultado_da_ligacao = telefonista.ligar()
+        telefone_mock.telefonar.assert_called_once_with('2345678')
+        self.assertEqual('Contato Victor, Tel fake para 2345678', resultado_da_ligacao)
 
     def test_telefonar_dois_contatos(self):
         telefonista = Telefonista()
-        telefonista._telefone = TelefoneMoc()
+        telefone_mock = TelefoneMock()
+        telefonista._telefone = telefone_mock
         victor = ('Victor', '2345678')
         renzo = ('Renzo', '8765432')
         telefonista.adicionar_contato(*victor)
