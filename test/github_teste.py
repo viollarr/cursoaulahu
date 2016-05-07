@@ -1,4 +1,5 @@
 import unittest
+from unittest import TestCase, mock
 from unittest.mock import Mock
 from os import path
 import sys
@@ -45,24 +46,19 @@ GET_MOCK_RESULT = """
 }"""
 
 
-class AvatarTests(unittest.TestCase):
-    def setUp(self):
-        self.get_real = github.requests.get
-
-    def tearDown(self):
-        github.requests.get = self.get_real
-
-    def test_avatar_url(self):
+class AvatarTests(TestCase):
+    @mock.patch('cursoaulahu.github.requests.get')
+    @mock.patch('cursoaulahu.github.requests.post')
+    def test_avatar_url(self, post_mock, get_mock):
         # teste unitário não pode depender de rede ou da lib request
         response = Mock()
         response.text = GET_MOCK_RESULT
-        get_mock = Mock(return_value=response)
-        github.requests.get = get_mock
+        get_mock.return_value = response
         self.assertEqual('https://avatars.githubusercontent.com/u/2787697?v=3', github.buscar_avatar('viollarr'))
         get_mock.assert_called_once_with('https://api.github.com/users/viollarr')
 
 
-class IntegracaoTests(unittest.TestCase):
+class IntegracaoTests(TestCase):
     def test_avatar_url(self):
         self.assertEqual('https://avatars.githubusercontent.com/u/3457115?v=3', github.buscar_avatar('renzon'))
 
