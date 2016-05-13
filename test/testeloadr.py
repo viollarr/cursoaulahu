@@ -12,7 +12,7 @@ ROOT_PATH = os.path.dirname(__file__)
 def main():
     path_setup()
     tests = unittest.TestLoader().discover(ROOT_PATH, "*.py")
-    result = unittest.TextTestRunner().run(tests)
+    result = unittest.TextTestRunner(verbosity=2).run(tests)
     if not result.wasSuccessful():
         sys.exit(1)
 
